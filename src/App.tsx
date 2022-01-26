@@ -79,15 +79,18 @@ function App() {
 
     return (
         <div className="App">
-            <Container fixed>
+            <Container fixed style={{marginTop:"20%"}}>
                 <Stack
                     style={{
+                        display: "flex",
+                        justifyContent:"center",
+                        alignItems:"center",
                         textAlign: 'center',
-                        width: '280px',
+                        // width: '280px',
                         fontSize: '20px',
-                        position: 'absolute',
-                        bottom: '50%',
-                        right: '50%'
+                        // position: 'absolute',
+                        // bottom: '50%',
+                        // right: '50%'
                     }}>
                     <Paper variant={'outlined'}>
                         <Counter count={count}
