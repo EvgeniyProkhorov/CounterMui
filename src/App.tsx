@@ -1,58 +1,73 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import {Counter} from "./Components/Counter";
 import {Settings} from "./Components/Settings";
 import {Container, Paper, Stack} from "@mui/material";
+import {useDispatch, useSelector} from "react-redux";
+import {AppStateType} from "./Redux/store";
+import {
+    CounterType,
+    incrCounter,
+    resetCounter,
+    setCount,
+    setMaxValue,
+    setStartValue,
+    settingsMode
+} from "./Redux/counterReducer";
 
 function App() {
-    const [count, setCount] = useState<number>(0)
-    const [startValue, setStartValue] = useState<number>(0)
-    const [maxValue, setMaxValue] = useState<number>(5)
-    const [settingsMode, setSettingsMode] = useState<null | string>(null)
+    // const [count, setCount] = useState<number>(0)
+    // const [startValue, setStartValue] = useState<number>(0)
+    // const [maxValue, setMaxValue] = useState<number>(5)
+    // const [settingsMode, setSettingsMode] = useState<null | string>(null)
+
+    const dispatch = useDispatch()
+    const counter = useSelector<AppStateType, CounterType>(state => state.counterState)
 
     useEffect(() => {
         let startValueAsStr = localStorage.getItem('Start value')
-        if (startValueAsStr) {
-            setStartValue(JSON.parse(startValueAsStr))
-            setCount(JSON.parse(startValueAsStr))
-        }
-    }, [])
-    useEffect(() => {
         let maxValueAsStr = localStorage.getItem('Max value')
-        if (maxValueAsStr) {
-            setMaxValue(JSON.parse(maxValueAsStr))
+        if (startValueAsStr) {
+            dispatch(setStartValue(JSON.parse(startValueAsStr)))
+            dispatch(setCount(JSON.parse(startValueAsStr)))
         }
-    }, [])
-    useEffect(() => {
-        localStorage.setItem('Start value', JSON.stringify(startValue))
-    }, [startValue])
-    useEffect(() => {
-        localStorage.setItem('Max value', JSON.stringify(maxValue))
-    }, [maxValue])
+        if (maxValueAsStr) {
+            dispatch(setMaxValue(JSON.parse(maxValueAsStr)))
+        }
+    }, [dispatch])
 
+    useEffect(() => {
+        localStorage.setItem('Start value', JSON.stringify(counter.startValue))
+        localStorage.setItem('Max value', JSON.stringify(counter.maxValue))
+
+    }, [counter.maxValue, counter.startValue])
+
+    const setSettingsMode = (value: null | string) => {
+        dispatch(settingsMode(value))
+    }
 
     const setMaxValueFn = (value: number) => {
         if (value >= 0) {
-            settingModeFn(startValue, value)
-            setMaxValue(value)
+            settingModeFn(counter.startValue, value)
+            dispatch(setMaxValue(value))
         }
         console.log(`Max Value is - ${value}`)
     }
     const setStartValueFn = (value: number) => {
         if (value >= 0) {
-            settingModeFn(value, maxValue)
-            setStartValue(value)
-            setCount(value)
+            settingModeFn(value, counter.maxValue)
+            dispatch(setStartValue(value))
+            dispatch(setCount(value))
         }
 
         console.log(`Start Value is - ${value}`)
         console.log(`Count Value is - ${value}`)
     }
     const incrementBtn = () => {
-        count < maxValue ? setCount(count + 1) : setCount(maxValue)
+        counter.count < counter.maxValue ? dispatch(incrCounter()) : dispatch(setCount(counter.maxValue))
     }
     const resetBtn = () => {
-        setCount(startValue)
+        dispatch(resetCounter())
     }
     const setValues = (maxVl: number, startVl: number) => {
         setMaxValue(maxVl)
@@ -60,31 +75,31 @@ function App() {
     }
     const settingModeFn = (start: number, max: number) => {
         if (start >= max) {
-            return setSettingsMode('Invalid value!')
+            return dispatch(settingsMode('Invalid value!'))
         } else if (start < 0) {
-            return setSettingsMode('Invalid value!')
+            return dispatch(settingsMode('Invalid value!'))
         } else if (max < 0) {
-            return setSettingsMode('Invalid value!')
+            return dispatch(settingsMode('Invalid value!'))
         }
-        return setSettingsMode('Enter value and press Set')
+        return dispatch(settingsMode('Enter value and press Set'))
     }
 
     //Disabled rule for inc button
-    const isIncDisabled = maxValue === count
-        || settingsMode === 'Enter value and press Set'
-        || settingsMode === 'Invalid value!'
-    const isResetDisabled = settingsMode === 'Invalid value!'
-        || settingsMode === 'Enter value and press Set'
-    const isSetDisabled = !settingsMode || settingsMode === 'Invalid value!'
+    const isIncDisabled = counter.maxValue === counter.count
+        || counter.settingMode === 'Enter value and press Set'
+        || counter.settingMode === 'Invalid value!'
+    const isResetDisabled = counter.settingMode === 'Invalid value!'
+        || counter.settingMode === 'Enter value and press Set'
+    const isSetDisabled = !counter.settingMode || counter.settingMode === 'Invalid value!'
 
     return (
         <div className="App">
-            <Container fixed style={{marginTop:"20%"}}>
+            <Container fixed style={{marginTop: "20%"}}>
                 <Stack
                     style={{
                         display: "flex",
-                        justifyContent:"center",
-                        alignItems:"center",
+                        justifyContent: "center",
+                        alignItems: "center",
                         textAlign: 'center',
                         // width: '280px',
                         fontSize: '20px',
@@ -93,17 +108,17 @@ function App() {
                         // right: '50%'
                     }}>
                     <Paper variant={'outlined'}>
-                        <Counter count={count}
+                        <Counter count={counter.count}
                                  incrementBtn={incrementBtn} incrBtnState={isIncDisabled}
                                  resetBtn={resetBtn} resetBtnState={isResetDisabled}
-                                 settingsMode={settingsMode}
-                                 maxValue={maxValue}
+                                 settingsMode={counter.settingMode}
+                                 maxValue={counter.maxValue}
                         />
                         <Settings setStartValueFn={setStartValueFn}
                                   setMaxValueFn={setMaxValueFn}
-                                  maxValue={maxValue}
-                                  startValue={startValue}
-                                  settingsMode={settingsMode}
+                                  maxValue={counter.maxValue}
+                                  startValue={counter.startValue}
+                                  settingsMode={counter.settingMode}
                                   setSettingsMode={setSettingsMode}
                                   setValues={setValues}
                                   settingsBtn={isSetDisabled}
