@@ -1,19 +1,19 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
-import {Counter} from "./Components/Counter";
-import {Settings} from "./Components/Settings";
-import {Container, Paper, Stack} from "@mui/material";
-import {useDispatch, useSelector} from "react-redux";
-import {AppStateType} from "./Redux/store";
+import { Counter } from "./Components/Counter";
+import { Settings } from "./Components/Settings";
+import { Container, Paper, Stack } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { AppStateType } from "./redux/store/store";
 import {
-    CounterType,
     incrCounter,
     resetCounter,
     setCount,
     setMaxValue,
     setStartValue,
     settingsMode
-} from "./Redux/counterReducer";
+} from "./redux/reducers/counterReducer/counterActionCreators";
+import { CounterType } from './redux/reducers/counterReducer/counterReducer';
 
 function App() {
     // const [count, setCount] = useState<number>(0)
@@ -94,7 +94,7 @@ function App() {
 
     return (
         <div className="App">
-            <Container fixed style={{marginTop: "20%"}}>
+            <Container fixed style={{ marginTop: "20%" }}>
                 <Stack
                     style={{
                         display: "flex",
@@ -109,19 +109,19 @@ function App() {
                     }}>
                     <Paper variant={'outlined'}>
                         <Counter count={counter.count}
-                                 incrementBtn={incrementBtn} incrBtnState={isIncDisabled}
-                                 resetBtn={resetBtn} resetBtnState={isResetDisabled}
-                                 settingsMode={counter.settingMode}
-                                 maxValue={counter.maxValue}
+                            incrementBtn={incrementBtn} incrBtnState={isIncDisabled}
+                            resetBtn={resetBtn} resetBtnState={isResetDisabled}
+                            settingsMode={counter.settingMode}
+                            maxValue={counter.maxValue}
                         />
                         <Settings setStartValueFn={setStartValueFn}
-                                  setMaxValueFn={setMaxValueFn}
-                                  maxValue={counter.maxValue}
-                                  startValue={counter.startValue}
-                                  settingsMode={counter.settingMode}
-                                  setSettingsMode={setSettingsMode}
-                                  setValues={setValues}
-                                  settingsBtn={isSetDisabled}
+                            setMaxValueFn={setMaxValueFn}
+                            maxValue={counter.maxValue}
+                            startValue={counter.startValue}
+                            settingsMode={counter.settingMode}
+                            setSettingsMode={setSettingsMode}
+                            setValues={setValues}
+                            settingsBtn={isSetDisabled}
                         />
                     </Paper>
                 </Stack>
